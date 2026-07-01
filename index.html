@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Welcome to VIP Kiosk</title>
+  <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="application-name" content="VIP Kiosk">
+<meta name="apple-mobile-web-app-title" content="VIP Kiosk">
+<meta name="theme-color" content="#0a0a0a">
+
+<link rel="apple-touch-icon" href="https://i.ibb.co/QFLc1yJQ/IMG-20260611-001134.jpg">
+<link rel="icon" type="image/png" href="https://i.ibb.co/QFLc1yJQ/IMG-20260611-001134.jpg">
+<link rel="manifest" href="manifest-home.json">
+
+<style>
+  /* UPDATED COLORS: Dark Background with Gold Boxes */
+  :root { 
+    --bg: #0a0a0a; 
+    --card: #1a1a1a; 
+    --input: #252525; 
+    --border: #d4af37; /* Metallic Gold Border */
+    --text: #ffffff; 
+  }
+  @media (prefers-color-scheme: light) { :root { --bg: #0a0a0a; --card: #1a1a1a; --input: #252525; --border: #d4af37; --text: #ffffff; } }
+
+  /* ZERO FLICKER FIX: display starts as none, JS switches it to flex */
+  body { display: none; font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; justify-content: center; align-items: center; min-height: 90vh; transition: background-color 0.5s; }
+  
+  .card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); text-align: center; display: block; position: relative; box-sizing: border-box; border: 1px solid var(--border); }
+  
+  @media screen and (orientation: landscape) and (max-height: 500px) { body::before { content: "Please rotate your phone to portrait mode for the best experience."; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; z-index: 99999; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; font-size: 20px; font-weight: bold; } }
+
+  input, button { touch-action: manipulation; box-sizing: border-box; }
+
+  .dark-input { width: 100%; padding: 18px; font-size: clamp(16px, 4vw, 18px); border-radius: 24px; text-align: center; background: var(--input); border: 2px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4); color: var(--text) !important; font-weight: 700; transition: 0.3s; outline: none; }
+  .dark-input::placeholder { color: #888; font-weight: 500; }
+  .dark-input:focus { border-color: #f1c40f; }
+  
+  .phone-wrapper { display: flex; align-items: center; background: var(--input); border: 2px solid var(--border); border-radius: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4); transition: 0.3s; overflow: hidden; margin-bottom: 5px; }
+  .phone-wrapper:focus-within { border-color: #f1c40f; }
+  .prefix { padding: 18px 0 18px 18px; color: #888; font-weight: 700; font-size: clamp(16px, 4vw, 18px); user-select: none; }
+  .phone-input-raw { width: 100%; padding: 18px 18px 18px 8px; font-size: clamp(16px, 4vw, 18px); background: transparent; border: none; color: var(--text); font-weight: 700; outline: none; text-align: left; }
+  .phone-input-raw::placeholder { color: #888; font-weight: 500; }
+
+  .input-wrapper { margin-bottom: 15px; }
+  .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+  
+  .btn-mic-dark { background: var(--input); border: 2px solid var(--border); border-radius: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4); color: var(--text); cursor: pointer; transition: 0.3s; width: 65px; height: 62px; font-size: 24px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+  .btn-mic-dark:hover { background: #444; }
+  .btn-mic-dark:active { transform: scale(0.95); }
+
+  @keyframes errorShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+  .error-border { border-color: #ff5252 !important; animation: errorShake 0.4s; background: rgba(255,82,82,0.1) !important; }
+  .error-text { color: #ff5252; font-size: 12px; display: none; text-align: left; margin-bottom: 10px; padding-left: 15px; font-weight: bold; }
+
+  @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 82, 82, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); } }
+  .mic-listening { animation: micPulse 1.5s infinite; border-color: #ff5252 !important; background: #552222 !important; }
+
+  .submit-container { width: 100%; margin-top: 25px; display: flex; justify-content: center; flex-direction: column; gap: 15px; }
+  .futuristic-btn { position: relative; border: 2px solid var(--border); border-radius: 50px; color: #ffffff !important; font-weight: 900; font-size: clamp(16px, 4vw, 20px); letter-spacing: 1px; padding: 18px 20px; width: 100%; cursor: pointer; background: #1a1a1a; transition: all 0.3s ease; }
+  .btn-visitor { background: #332d18 !important; color: var(--text) !important; font-size: 15px; padding: 15px; }
+  .btn-visitor:hover { background: #554a20 !important; }
+  .futuristic-btn:active { transform: scale(0.95) !important; }
+  .futuristic-btn:disabled { background-color: rgba(100, 100, 100, 0.1) !important; color: #666 !important; animation: none; box-shadow: none; cursor: not-allowed; border-color: #444; }
+
+  .consent-box { display: flex; align-items: center; gap: 10px; font-size: 13px; margin: 25px 0 15px 0; color: #bbb; text-align: left; }
+  .listening-text { color: var(--text); font-weight: bold; margin-bottom: 5px; display: none; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+  .listening-hint { font-size: 11px; color: #888; display: none; margin-bottom: 15px; } 
+  .footer-links { font-size: 10px; color: #666; margin-top: 20px; text-align: center; text-decoration: underline; cursor: pointer; }
+
+  #inapp-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(15px); justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; text-align: center; }
+  .warning-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 35px; border-radius: 30px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  #network-badge { position: absolute; top: 20px; right: 20px; width: 12px; height: 12px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 10px #4CAF50; transition: 0.3s; }
+  .badge-offline { background: #ff5252 !important; box-shadow: 0 0 10px #ff5252 !important; }
+</style>
+</head>
+<body>
+
+<div id="inapp-warning">
+  <div class="warning-box">
+    <h2 style="margin-top:0; color: #ff8a8a;">⚠️ Action Required</h2>
+    <p style="font-size: 18px; line-height: 1.5;">For Voice Typing to work smoothly, please click the <b>3 dots (⋮)</b> in the corner and select<br><br><b>"Open in Chrome"</b> or <b>"Open in Safari"</b>.</p>
+    <button onclick="document.getElementById('inapp-warning').style.display='none'" style="margin-top:20px; padding: 15px 30px; border-radius: 15px; background: #ffffff; border: none; color: #000; font-weight: 900; cursor: pointer; font-size: 16px;">CONTINUE WITHOUT VOICE</button>
+  </div>
+</div>
+
+<div class="card" id="step-1">
+  <div id="network-badge" title="Network Status"></div>
+  <img id="shopLogo" src="https://i.ibb.co/TMjycHLN/ei-1780753422474-removebg-preview.png" style="max-width: 120px; max-height: 120px; border-radius: 30px; margin-bottom: 15px; object-fit: contain;">
+  <div id="shopTitle" style="color: var(--text); margin-top: 0; font-size: 14pt; font-weight: bold;">Loading...</div>
+  <p style="font-size:12px; opacity:0.7; margin-top: 5px; margin-bottom: 20px;">Returning VIPs: Only Number is required!</p>
+  
+  <div id="listen-status" class="listening-text">🎤 Listening... Speak clearly!</div>
+  <div id="listen-hint" class="listening-hint">Speak in any language, we'll format it.</div>
+
+  <div class="input-wrapper">
+    <div class="phone-wrapper" id="phone-box-visual">
+      <div class="prefix">+91</div>
+      <input type="tel" id="input-phone" class="phone-input-raw save-draft" placeholder="WhatsApp Number" maxlength="10" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="numeric">
+    </div>
+    <p id="phone-error" class="error-text">Invalid 10-digit number detected.</p>
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="input-name" class="dark-input save-draft" placeholder="Name" maxlength="50" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="btn-mic-dark" onclick="startMic('input-name', this)">🎙️</button>
+  </div>
+  <p id="name-error" class="error-text">Please enter a valid name (No numbers).</p>
+  
+  <div class="input-group">
+    <input type="text" id="input-age" class="dark-input save-draft" placeholder="Age" maxlength="3" autocomplete="off" inputmode="numeric">
+    <button class="btn-mic-dark" onclick="startMic('input-age', this)">🎙️</button>
+  </div>
+  
+  <div class="input-group">
+    <input type="text" id="input-dob" class="dark-input save-draft" placeholder="Birthday" maxlength="30" autocomplete="off">
+    <button class="btn-mic-dark" onclick="startMic('input-dob', this)">🎙️</button>
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="input-anni" class="dark-input save-draft" placeholder="Anniversary (Optional)" maxlength="30" autocomplete="off">
+    <button class="btn-mic-dark" onclick="startMic('input-anni', this)">🎙️</button>
+  </div>
+
+  <div class="consent-box">
+    <input type="checkbox" id="consent-check" checked style="width: 22px; height: 22px; margin: 0; flex-shrink: 0;">
+    <label for="consent-check" style="line-height: 1.3;">I consent to receive offers via WhatsApp.</label>
+  </div>
+  
+  <div class="submit-container">
+    <button class="futuristic-btn" id="btn-submit" onclick="submitForm()">ACCESS VIP WALLET</button>
+    
+    <button type="button" class="futuristic-btn btn-visitor" onclick="joinVisitor('default')">Join Our WhatsApp Community</button>
+  </div>
+  <div class="footer-links">Privacy Policy & Data Protection</div>
+</div>
+
+<script>
+  const REVIZO_API = "https://script.google.com/macros/s/AKfycbzzzP7KIUr1GkW5et05N3qmxkQyfV_JDA5d1rkpNEnJLB9EQUHlRBTnERL4ojUZVdl5/exec"; 
+  const urlParams = new URLSearchParams(window.location.search);
+  const SHOP_ID = urlParams.get('shop') || 'RAJAGARMENTS'; 
+  
+  let VISITOR_LINKS = { "default": "" };
+
+  // DYNAMIC BRIDGE: Automatically pulls your WhatsApp links from your Google Sheet
+  fetch(REVIZO_API + "?action=getShopMeta&shop=" + SHOP_ID)
+    .then(res => res.json())
+    .then(data => {
+      if(data.waLinks) {
+        VISITOR_LINKS = data.waLinks;
+      }
+    })
+    .catch(err => console.log("Failed to load WhatsApp links from sheet", err));
+
+  let isFormDirty = false;
+
+  window.onload = function() {
+    const savedMobile = localStorage.getItem("revizo_mobile"); 
+    
+    // 1. APPLE IOS BMB-SQUAD (Back-Forward Cache Killer)
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload(); 
+        }
+    });
+
+    // 2. ZERO-FLICKER ROUTING
+    if (savedMobile) {
+        window.location.replace("rewards.html" + window.location.search);
+        return; 
+    } else {
+        document.body.style.display = "flex"; 
+    }
+
+    fetch(REVIZO_API + "?action=getShopMeta&shopId=" + SHOP_ID)
+      .then(r => r.json()).then(meta => { if(meta.shopName) document.getElementById('shopTitle').innerText = meta.shopName; });
+
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    if (ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1 || ua.indexOf('Instagram') > -1 || ua.indexOf('WhatsApp') > -1) { document.getElementById('inapp-warning').style.display = 'flex'; }
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) { document.querySelectorAll('.btn-mic-dark').forEach(m => m.style.display = 'none'); }
+    
+    fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' }).catch(() => toggleOffline(true));
+
+    document.querySelectorAll('.save-draft').forEach(input => {
+      let saved = localStorage.getItem('draft_' + input.id);
+      if(saved) { input.value = saved; isFormDirty = true; }
+      input.addEventListener('input', () => { localStorage.setItem('draft_' + input.id, input.value); isFormDirty = true; });
+      input.addEventListener('focus', () => { setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); });
+    });
+
+    document.body.addEventListener('touchstart', unlockAudio, {once:true});
+    document.body.addEventListener('click', unlockAudio, {once:true});
+  };
+
+  window.addEventListener('offline', () => toggleOffline(true));
+  window.addEventListener('online', () => { toggleOffline(false); syncOfflineData(); });
+  window.addEventListener('beforeunload', (e) => { if(isFormDirty) { e.preventDefault(); e.returnValue = ''; } });
+
+  function toggleOffline(isOff) { const b = document.getElementById('network-badge'); if(isOff) b.classList.add('badge-offline'); else b.classList.remove('badge-offline'); }
+  function unlockAudio() { if(window.speechSynthesis) { let s = new SpeechSynthesisUtterance(''); s.volume = 0; window.speechSynthesis.speak(s); } }
+
+  function formatSmartDate(raw) {
+    if (!raw) return ""; let clean = raw.toLowerCase().replace(/(st|nd|rd|th|वीं|वें)/g, ""); const months = { 'jan': '01', 'january': '01', 'janvari': '01', 'जनवरी': '01', 'ਜਨਵਰੀ': '01', 'feb': '02', 'february': '02', 'farvari': '02', 'फरवरी': '02', 'फ़रवरी': '02', 'ਫਰਵਰੀ': '02', 'mar': '03', 'march': '03', 'मार्च': '03', 'ਮਾਰਚ': '03', 'apr': '04', 'april': '04', 'aprail': '04', 'अप्रैल': '04', 'ਅਪ੍ਰੈਲ': '04', 'may': '05', 'mai': '05', 'मई': '05', 'ਮਈ': '05', 'jun': '06', 'june': '06', 'जून': '06', 'ਜੂਨ': '06', 'jul': '07', 'july': '07', 'julai': '07', 'जुलाई': '07', 'ਜੁਲਾਈ': '07', 'aug': '08', 'august': '08', 'agast': '08', 'अगस्त': '08', 'ਅਗਸਤ': '08', 'sep': '09', 'september': '09', 'sitambar': '09', 'सितंबर': '09', 'सितम्बर': '09', 'ਸਤੰਬਰ': '09', 'oct': '10', 'october': '10', 'aktubar': '10', 'अक्टूबर': '10', 'अकतूबर': '10', 'nov': '11', 'november': '11', 'navambar': '11', 'नवंबर': '11', 'नवम्बर': '11', 'ਨਵੰਬਰ': '11', 'dec': '12', 'december': '12', 'disambar': '12', 'दिसंबर': '12', 'दिसम्बर': '12', 'ਦਸੰਬਰ': '12' };
+    for (let m in months) clean = clean.replace(new RegExp(m, 'g'), " " + months[m] + " "); let n = clean.match(/\d+/g); if (!n) return ""; let d = n[0].padStart(2, '0'), y = new Date().getFullYear(); if (n.length >= 3) y = n[2].length === 2 ? (parseInt(n[2]) > 30 ? '19'+n[2] : '20'+n[2]) : n[2]; return `${y}-${(n[1]||'01').padStart(2, '0')}-${d}`;
+  }
+  function formatSmartAge(raw) { if (!raw) return ""; let numbers = raw.match(/\d+/g); return (numbers && numbers.length > 0) ? numbers[0] : ""; }
+
+  function joinVisitor(ageGroup) { const link = VISITOR_LINKS[ageGroup] || VISITOR_LINKS["default"]; if (link && link !== "PASTE_LINK_DEFAULT" && !link.includes("PASTE_LINK")) { window.open(link, '_blank'); } else { alert("Community link not yet configured."); } }
+
+  document.getElementById('input-phone').addEventListener('input', function() { this.value = this.value.replace(/\D/g, ''); });
+  document.getElementById('input-name').addEventListener('blur', function() { let val = this.value.trim().replace(/[<>]/g, ""); this.value = val.toLowerCase().replace(/\b\w/g, s => s.toUpperCase()); const err = document.getElementById('name-error'); if(/\d/.test(this.value)) { this.classList.add('error-border'); err.style.display = 'block'; } else { this.classList.remove('error-border'); err.style.display = 'none'; } });
+  document.getElementById('input-phone').addEventListener('blur', function() { const isLazy = /^(?!([0-9])\1{9})[6-9]\d{9}$/.test(this.value); const err = document.getElementById('phone-error'); if(!isLazy && this.value !== '') { document.getElementById('phone-box-visual').classList.add('error-border'); err.style.display = 'block'; } else { document.getElementById('phone-box-visual').classList.remove('error-border'); err.style.display = 'none'; } });
+
+  function syncOfflineData() { let savedProfile = localStorage.getItem('offline_payload'); if (savedProfile) { let data = JSON.parse(savedProfile); fetch(REVIZO_API + "?action=submitFullProfile&shopId=" + data.shopId + "&mobile=" + data.mobile + "&name=" + encodeURIComponent(data.name) + "&category=" + data.category + "&dob=" + data.dob + "&anniversary=" + data.anniversary).then(() => { localStorage.removeItem('offline_payload'); }); } }
+
+  function submitForm() {
+    const phone = document.getElementById('input-phone').value;
+    const nameInput = document.getElementById('input-name');
+    if(!document.getElementById('consent-check').checked) return alert("You must consent to receive offers via WhatsApp.");
+    if (!/^(?!([0-9])\1{9})[6-9]\d{9}$/.test(phone)) { document.getElementById('phone-box-visual').classList.add('error-border'); return alert("Invalid Phone Number."); }
+    
+    let lastSub = sessionStorage.getItem('last_submit');
+    if(lastSub && (Date.now() - lastSub < 10000)) return alert("Please wait before submitting again.");
+    sessionStorage.setItem('last_submit', Date.now());
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true; btn.innerText = "LOADING...";
+
+    fetch(REVIZO_API + "?action=checkWallet&shopId=" + SHOP_ID + "&mobile=" + phone)
+      .then(res => res.json()).then(data => {
+        if(data.status !== "NOT_FOUND") {
+          localStorage.setItem("revizo_mobile", phone); 
+          localStorage.setItem("revizo_category", data.category || "default");
+
+          isFormDirty = false;
+          window.location.replace("rewards.html" + window.location.search);
+        } else {
+          let name = nameInput.value.trim().replace(/[<>]/g, ""); 
+          let ageStr = formatSmartAge(document.getElementById('input-age').value);
+          let dob = formatSmartDate(document.getElementById('input-dob').value);
+          let profileErr = false;
+          if (name.length < 2 || /\d/.test(name)) { nameInput.classList.add('error-border'); profileErr = true; } 
+          if(!ageStr) { document.getElementById('input-age').classList.add('error-border'); profileErr = true; }
+          if(!dob) { document.getElementById('input-dob').classList.add('error-border'); profileErr = true; }
+          if(profileErr) { alert("NEW VIP: Please fill Name, Age, and Birthday to create wallet!"); btn.disabled = false; btn.innerText = "ACCESS VIP WALLET"; return; }
+          
+          let ageNum = parseInt(ageStr); let cat = "Other";
+          if(ageNum >= 16 && ageNum <= 20) cat = "16 to 20"; else if(ageNum >= 21 && ageNum <= 25) cat = "21 to 25"; else if(ageNum >= 26 && ageNum <= 35) cat = "26 to 35"; else if(ageNum >= 36 && ageNum <= 44) cat = "36 to 44"; else if(ageNum >= 45) cat = "45 to 55";
+          
+          localStorage.setItem("revizo_mobile", phone); 
+          let ann = formatSmartDate(document.getElementById('input-anni').value);
+
+          fetch(REVIZO_API + "?action=submitFullProfile&shopId=" + SHOP_ID + "&mobile=" + phone + "&name=" + encodeURIComponent(name) + "&category=" + cat + "&dob=" + dob + "&anniversary=" + ann)
+            .then(() => {
+              isFormDirty = false; document.querySelectorAll('.save-draft').forEach(i => localStorage.removeItem('draft_' + i.id));
+              window.location.replace("rewards.html" + window.location.search);
+            }).catch(() => {
+              let offData = { shopId: SHOP_ID, mobile: phone, name: name, category: cat, dob: dob, anniversary: ann };
+              localStorage.setItem('offline_payload', JSON.stringify(offData));
+              btn.style.backgroundColor = "rgba(255, 80, 80, 0.8)"; setTimeout(() => { btn.style.backgroundColor = ""; }, 3000);
+              alert("INTERNET ERROR: Saved locally. We will auto-submit when online.");
+              btn.disabled = false; btn.innerText = "ACCESS VIP WALLET";
+            });
+        }
+      }).catch(() => { btn.disabled = false; btn.innerText = "ACCESS VIP WALLET"; btn.style.backgroundColor = "rgba(255, 80, 80, 0.8)"; setTimeout(() => { btn.style.backgroundColor = ""; }, 3000); });
+  }
+
+  function startMic(id, btnElement) {
+    document.getElementById(id).value = ''; 
+    const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    rec.lang = 'en-IN'; 
+    document.getElementById('listen-status').style.display = 'block'; document.getElementById('listen-hint').style.display = 'block'; btnElement.classList.add('mic-listening'); 
+    rec.onresult = (e) => { let spoken = e.results[0][0].transcript; if(spoken.trim() === "") alert("We couldn't hear you. Please speak clearly!"); else { document.getElementById(id).value = spoken; document.getElementById(id).dispatchEvent(new Event('input')); document.getElementById(id).dispatchEvent(new Event('blur')); } endMic(btnElement); };
+    rec.onerror = (e) => { endMic(btnElement); alert("Microphone error: " + e.error + ". Please grant permissions."); };
+    rec.start();
+  }
+  function endMic(btnElement) { document.getElementById('listen-status').style.display = 'none'; document.getElementById('listen-hint').style.display = 'none'; btnElement.classList.remove('mic-listening'); }
+</script>
+</body>
+</html>
