@@ -1,6 +1,6 @@
 {
-  "name": "Raja Garments VIP",
-  "short_name": "Raja VIP",
+  "name": "Revizo VIP Wallet",
+  "short_name": "VIP Wallet",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
