@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>VIP Rewards Wallet</title>
+<title>YOUR REWARDS WALLET</title>
 <style>
   :root { --bg: #f0f4f8; --card: #ffffff; --text: #000000; }
   @media (prefers-color-scheme: dark) { :root { --bg: #1a1a1a; --card: #252525; --text: #ffffff; } }
@@ -72,7 +72,7 @@
   <div id="visitStatus" class="status-badge"></div>
 
   <div id="staticCouponBox" class="fancy-card c-gold" style="display: none; text-align: center;">
-    <div style="font-size: 12px; font-weight: 900; letter-spacing: 1px; opacity: 0.8;">🔥 SPECIAL STORE OFFER</div>
+    <div style="font-size: 12px; font-weight: 900; letter-spacing: 1px; opacity: 0.8;">🔥 SPECIAL SHOP OFFER</div>
     <div id="staticCouponText" style="font-size: 20px; font-weight: 900; margin-top: 5px;"></div>
   </div>
 
@@ -104,7 +104,7 @@
 
   <div id="reviewBox" class="star-box" style="display: none;">
       <div style="font-weight: 900; font-size: 16px; margin-bottom: 5px;">Rate Your Visit Today</div>
-      <div style="font-size: 12px; color: #666;">Your feedback helps us improve</div>
+      <div style="font-size: 12px; color: #666;">Your REVIEW helps us IMPROVE</div>
       <div class="stars">
           <span onclick="rateShop(1)">⭐</span>
           <span onclick="rateShop(2)">⭐</span>
@@ -115,9 +115,9 @@
   </div>
 
   <div id="socialBox" class="social-grid" style="display: none;">
-      <a id="btnWaChat" href="#" target="_blank" class="chip chip-wa" style="display: none;">💬 WhatsApp Us</a>
-      <a id="btnInsta" href="#" target="_blank" class="chip chip-insta" style="display: none;">📸 Follow Us</a>
-      <a id="btnWeb" href="#" target="_blank" class="chip chip-web" style="display: none;">🌐 Our Website</a>
+      <a id="btnWaChat" href="#" target="_blank" class="chip chip-wa" style="display: none;">💬 WHATSAPP US</a>
+      <a id="btnInsta" href="#" target="_blank" class="chip chip-insta" style="display: none;">📸 FOLLOW US</a>
+      <a id="btnWeb" href="#" target="_blank" class="chip chip-web" style="display: none;">🌐 OUR WEBSITE</a>
   </div>
 
   <button id="logoutBtn" onclick="secureLogout()" style="background: transparent; border: 2px solid #ff4444; color: #ff4444; padding: 12px; border-radius: 12px; margin-top: 25px; width: 100%; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; box-sizing: border-box;">🚪 LOG OUT</button>
@@ -129,11 +129,11 @@
 <div id="waGateOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
     <div style="background: white; padding: 25px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 320px; width: 100%; box-sizing: border-box; margin: auto;">
         <div style="font-size: 42px; margin-bottom: 5px;">🎁</div>
-        <h2 style="color: #333; margin: 0 0 8px 0; font-family: sans-serif; font-size: 22px; font-weight: 800;">Reward Locked</h2>
-        <p style="color: #666; margin: 0 0 20px 0; font-family: sans-serif; font-size: 14px; line-height: 1.4;">Join our VIP WhatsApp Community to verify your profile and instantly reveal your voucher!</p>
+        <h2 style="color: #333; margin: 0 0 8px 0; font-family: sans-serif; font-size: 22px; font-weight: 800;">Rewards Locked</h2>
+        <p style="color: #666; margin: 0 0 20px 0; font-family: sans-serif; font-size: 14px; line-height: 1.4;">Join WhatsApp to instantly reveal your REWARDS 🎁!</p>
         
         <a href="#" id="dynamicWaGateLink" onclick="unlockWallet()" target="_blank" style="display: block; background-color: #25D366; color: white; padding: 14px; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 900; font-family: sans-serif; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4); width: 100%; box-sizing: border-box;">
-            🟢 JOIN TO REVEAL
+            🟢 JOIN For REWARDS 
         </a>
     </div>
 </div>
