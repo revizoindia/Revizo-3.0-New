@@ -15,17 +15,15 @@
 <link rel="manifest" href="manifest-home.json">
 
 <style>
-  /* UPDATED COLORS: Dark Background with Gold Boxes */
   :root { 
     --bg: #0a0a0a; 
     --card: #1a1a1a; 
     --input: #252525; 
-    --border: #d4af37; /* Metallic Gold Border */
+    --border: #d4af37; 
     --text: #ffffff; 
   }
   @media (prefers-color-scheme: light) { :root { --bg: #0a0a0a; --card: #1a1a1a; --input: #252525; --border: #d4af37; --text: #ffffff; } }
 
-  /* ZERO FLICKER FIX: display starts as none, JS switches it to flex */
   body { display: none; font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; justify-content: center; align-items: center; min-height: 90vh; transition: background-color 0.5s; }
   
   .card { background: var(--card); width: 100%; max-width: 400px; padding: 30px; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); text-align: center; display: block; position: relative; box-sizing: border-box; border: 1px solid var(--border); }
@@ -132,7 +130,7 @@
   <div class="submit-container">
     <button class="futuristic-btn" id="btn-submit" onclick="submitForm()">ACCESS YOUR WALLET</button>
     
-    <button type="button" class="futuristic-btn btn-visitor" onclick="joinVisitor('default')">JOIN WHATSAPP FOR OFFERS</button>
+    <button type="button" class="futuristic-btn btn-visitor" onclick="joinVisitor('default')">Join Our WhatsApp Community</button>
   </div>
   <div class="footer-links">Privacy Policy & Data Protection</div>
 </div>
@@ -144,7 +142,6 @@
   
   let VISITOR_LINKS = { "default": "" };
 
-  // DYNAMIC BRIDGE: Automatically pulls your WhatsApp links from your Google Sheet
   fetch(REVIZO_API + "?action=getShopMeta&shop=" + SHOP_ID)
     .then(res => res.json())
     .then(data => {
@@ -159,14 +156,12 @@
   window.onload = function() {
     const savedMobile = localStorage.getItem("revizo_mobile"); 
     
-    // 1. APPLE IOS BMB-SQUAD (Back-Forward Cache Killer)
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
             window.location.reload(); 
         }
     });
 
-    // 2. ZERO-FLICKER ROUTING
     if (savedMobile) {
         window.location.replace("rewards.html" + window.location.search);
         return; 
@@ -174,8 +169,12 @@
         document.body.style.display = "flex"; 
     }
 
+    // THIS IS THE FIX: Both Name and Logo will now update correctly!
     fetch(REVIZO_API + "?action=getShopMeta&shopId=" + SHOP_ID)
-      .then(r => r.json()).then(meta => { if(meta.shopName) document.getElementById('shopTitle').innerText = meta.shopName; });
+      .then(r => r.json()).then(meta => { 
+        if(meta.shopName) document.getElementById('shopTitle').innerText = meta.shopName; 
+        if(meta.logoUrl) document.getElementById('shopLogo').src = meta.logoUrl;
+      });
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     if (ua.indexOf('FBAN') > -1 || ua.indexOf('FBAV') > -1 || ua.indexOf('Instagram') > -1 || ua.indexOf('WhatsApp') > -1) { document.getElementById('inapp-warning').style.display = 'flex'; }
@@ -244,7 +243,7 @@
           if (name.length < 2 || /\d/.test(name)) { nameInput.classList.add('error-border'); profileErr = true; } 
           if(!ageStr) { document.getElementById('input-age').classList.add('error-border'); profileErr = true; }
           if(!dob) { document.getElementById('input-dob').classList.add('error-border'); profileErr = true; }
-          if(profileErr) { alert("NEW VIP: Please fill Name, Age, and Birthday to create wallet!"); btn.disabled = false; btn.innerText = "ACCESS VIP WALLET"; return; }
+          if(profileErr) { alert("NEW VIP: Please fill Name, Age, and Birthday to create wallet!"); btn.disabled = false; btn.innerText = "ACCESS YOUR WALLET"; return; }
           
           let ageNum = parseInt(ageStr); let cat = "Other";
           if(ageNum >= 16 && ageNum <= 20) cat = "16 to 20"; else if(ageNum >= 21 && ageNum <= 25) cat = "21 to 25"; else if(ageNum >= 26 && ageNum <= 35) cat = "26 to 35"; else if(ageNum >= 36 && ageNum <= 44) cat = "36 to 44"; else if(ageNum >= 45) cat = "45 to 55";
@@ -261,10 +260,10 @@
               localStorage.setItem('offline_payload', JSON.stringify(offData));
               btn.style.backgroundColor = "rgba(255, 80, 80, 0.8)"; setTimeout(() => { btn.style.backgroundColor = ""; }, 3000);
               alert("INTERNET ERROR: Saved locally. We will auto-submit when online.");
-              btn.disabled = false; btn.innerText = "ACCESS VIP WALLET";
+              btn.disabled = false; btn.innerText = "ACCESS YOUR WALLET";
             });
         }
-      }).catch(() => { btn.disabled = false; btn.innerText = "ACCESS VIP WALLET"; btn.style.backgroundColor = "rgba(255, 80, 80, 0.8)"; setTimeout(() => { btn.style.backgroundColor = ""; }, 3000); });
+      }).catch(() => { btn.disabled = false; btn.innerText = "ACCESS YOUR WALLET"; btn.style.backgroundColor = "rgba(255, 80, 80, 0.8)"; setTimeout(() => { btn.style.backgroundColor = ""; }, 3000); });
   }
 
   function startMic(id, btnElement) {
@@ -280,4 +279,3 @@
 </script>
 </body>
 </html>
-
