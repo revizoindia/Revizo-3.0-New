@@ -79,7 +79,7 @@
   </div>
 
   <div id="voucher-box" class="fancy-card c-light-purple">
-    <div style="font-size: 14px; opacity: 1; font-weight: 900; letter-spacing: 1px;">YOUR NEXT-BUY COUPON</div>
+    <div id="dynamicVoucherTitle" style="font-size: 14px; opacity: 1; font-weight: 900; letter-spacing: 1px;">YOUR NEXT-BUY COUPON</div>
     <div id="revVoucher" style="font-size: 22px; font-weight: 900; margin-top: 4px;">...</div>
     <div id="live-time" class="live-clock"></div>
   </div>
@@ -285,26 +285,38 @@
     let vText = data.voucher ? data.voucher.toString().toUpperCase() : "";
     let minPur = data.minPurchase ? data.minPurchase : "499";
     
-    // SMART REWARD CALCULATOR
     let rewardsArr = data.milestoneRewards ? data.milestoneRewards.split(',') : ["N/A", "50", "75", "100", "GIFT"];
     let nextReward = "50"; 
     
-    // Ye line automatically check karti hai ki customer kaunse step par hai aur agli value kya hai
     if (sCount < 5 && rewardsArr[sCount]) {
         nextReward = rewardsArr[sCount].trim();
     }
     
-    let earnText = nextReward.toUpperCase().includes("GIFT") ? "Earn a 🎁 SURPRISE next time." : "Earn ₹" + nextReward + " next time.";
-
-    // UPDATE: Khali aane par ab dynamically ₹25 (ya jo bhi next ho) dikhayega aur Min Purchase bhi pakka dikhayega!
-    if(vText === "N/A" || vText === "") {
-        document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px;'>Visit Logged! " + earnText + "</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
-    } else if (vText === "GIFT") {
-        document.getElementById("revVoucher").innerHTML = "<span style='font-size: 22px;'>🎁 Gift Earned!</span>";
-    } else if(vText === "TRY AGAIN" || vText === "JACKPOT" || vText.includes("FREE")) {
-        document.getElementById("revVoucher").innerHTML = vText;
+    // YAHAN HAI TUMHARA DYNAMIC ORDER LOGIC (Exactly 1, 2, 3, 4)
+    let isConfirmed = (data.status === "APPROVED" || data.status === "CLAIMED");
+    
+    if (isConfirmed) {
+        document.getElementById("dynamicVoucherTitle").innerHTML = "<span style='font-size: 19px; color: #fff;'>Visit Confirmed 👍</span>";
     } else {
-        document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + vText + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
+        document.getElementById("dynamicVoucherTitle").innerHTML = "YOUR NEXT-BUY COUPON";
+    }
+    
+    let subTitle = isConfirmed ? "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; color: rgba(255,255,255,0.9);'>YOUR NEXT-BUY COUPON</div>" : "";
+
+    if(vText === "N/A" || vText === "") {
+        document.getElementById("revVoucher").innerHTML = 
+            subTitle + 
+            "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + nextReward + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br>" +
+            "<span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
+    } else if (vText === "GIFT") {
+        document.getElementById("revVoucher").innerHTML = subTitle.replace("NEXT-BUY COUPON", "REWARD") + "<span style='font-size: 22px;'>🎁 Gift Earned!</span>";
+    } else if(vText === "TRY AGAIN" || vText === "JACKPOT" || vText.includes("FREE")) {
+        document.getElementById("revVoucher").innerHTML = subTitle.replace("NEXT-BUY COUPON", "REWARD") + vText;
+    } else {
+        document.getElementById("revVoucher").innerHTML = 
+            subTitle + 
+            "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + vText + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br>" +
+            "<span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
     }
 
     document.getElementById("stampCountText").innerText = sCount;
