@@ -38,7 +38,6 @@
   
   .congrats-box { background: linear-gradient(135deg, #FFD700, #FFA500); padding: 20px; border-radius: 15px; margin-top: 15px; margin-bottom: 15px; color: #000; box-shadow: 0 5px 15px rgba(255,165,0,0.4); animation: popIn 0.5s ease; border: 2px solid #fff; display: none;}
   
-  /* UPDATED SOCIAL GRID FOR LARGE HORIZONTAL BUTTONS */
   .social-grid { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: space-between; }
   .chip { flex: 1 1 45%; padding: 14px 10px; border-radius: 15px; font-size: 13px; font-weight: 900; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; text-align: center; }
   .chip:active { transform: scale(0.95); }
@@ -256,9 +255,10 @@
     
     if(data.instaLink) { document.getElementById("btnInsta").href = data.instaLink; document.getElementById("btnInsta").style.display = "flex"; showSocials = true; }
     
-    // UPDATED WHATSAPP PRE-FILLED MESSAGE
+    // DYNAMIC WHATSAPP MESSAGE LOGIC
     if(data.ownerFeedbackWA) { 
-        document.getElementById("btnWaChat").href = "https://wa.me/" + data.ownerFeedbackWA + "?text=Hi,%20Raja%20Garments"; 
+        let shopNm = data.shopName || "Raja Garments";
+        document.getElementById("btnWaChat").href = "https://wa.me/" + data.ownerFeedbackWA + "?text=Hi,%20" + encodeURIComponent(shopNm); 
         document.getElementById("btnWaChat").style.display = "flex"; 
         showSocials = true; 
     }
@@ -285,7 +285,9 @@
     let sCount = data.stamps || 0; 
     let vText = data.voucher ? data.voucher.toString().toUpperCase() : "";
     
-    // REVERTED COUPON TEXT LOGIC
+    // DYNAMIC MIN PURCHASE LOGIC
+    let minPur = data.minPurchase ? data.minPurchase : "499";
+    
     if(vText === "N/A" || vText === "") {
         document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px;'>Visit Logged! Earn ₹50 next time.</span>";
     } else if (vText === "GIFT") {
@@ -293,7 +295,7 @@
     } else if(vText === "TRY AGAIN" || vText === "JACKPOT" || vText.includes("FREE")) {
         document.getElementById("revVoucher").innerHTML = vText;
     } else {
-        document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + vText + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹499</span>";
+        document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + vText + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
     }
 
     document.getElementById("stampCountText").innerText = sCount;
@@ -338,4 +340,3 @@
 </script>
 </body>
 </html>
-
