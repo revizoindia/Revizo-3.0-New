@@ -119,7 +119,6 @@
 
   <button id="logoutBtn" onclick="secureLogout()" style="background: transparent; border: 2px solid #ff4444; color: #ff4444; padding: 12px; border-radius: 12px; margin-top: 25px; width: 100%; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; box-sizing: border-box;">🚪 LOG OUT</button>
 
-  <!-- YAHAN POLICY TEXT KO BADA AUR BOLD KIYA GAYA HAI -->
   <div id="exchangeText" style="font-size: 14px; margin-top: 20px; font-weight: 900; line-height: 1.6; opacity: 0.85; color: var(--text);"></div>
 </div>
 
@@ -226,7 +225,7 @@
       }
       if (data.status === "SUCCESS" || data.status === "ALREADY_PENDING") {
         btn.innerHTML = "⏳ WAITING...";
-        document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting for Approval...</span>"; 
+        document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting 4 Approval</span>"; 
         document.getElementById("visitStatus").className = "status-badge bg-warning";
         waitForCashier(savedMobile);
       } else { fetch(REVIZO_API + "?action=checkWallet&shopId=" + SHOP_ID + "&mobile=" + savedMobile).then(r => r.json()).then(showRewards); }
@@ -282,42 +281,56 @@
         if(!localStorage.getItem("wa_joined_gate")) { document.getElementById("waGateOverlay").style.display = "flex"; }
     }
     
+    // --- YAHAN SE TUMHARI NAYI SMART COUPON LOGIC START HOTI HAI ---
+    
     let sCount = data.stamps || 0; 
-    let vText = data.voucher ? data.voucher.toString().toUpperCase() : "";
     let minPur = data.minPurchase ? data.minPurchase : "499";
-    
     let rewardsArr = data.milestoneRewards ? data.milestoneRewards.split(',') : ["N/A", "50", "75", "100", "GIFT"];
-    let nextReward = "50"; 
     
-    if (sCount < 5 && rewardsArr[sCount]) {
-        nextReward = rewardsArr[sCount].trim();
-    }
+    // Auto-calculate "Today's Reward" and "Next Reward" directly from Visit Count
+    let todayReward = (sCount > 0 && rewardsArr[sCount - 1]) ? rewardsArr[sCount - 1].trim() : "N/A";
+    let nextReward = (sCount < 5 && rewardsArr[sCount]) ? rewardsArr[sCount].trim() : "GIFT";
     
     let isConfirmed = (data.status === "APPROVED" || data.status === "CLAIMED");
     
     if (isConfirmed) {
         document.getElementById("dynamicVoucherTitle").innerHTML = "<span style='font-size: 19px; color: #fff;'>Visit Confirmed 👍</span>";
+        
+        let todayHtml = "";
+        if (todayReward === "N/A" || todayReward === "") {
+            todayHtml = "<div style='background: #25D366; color: #000; padding: 4px 10px; border-radius: 8px; display: inline-block; font-size: 13px; font-weight: 900; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);'>✅ VISIT LOGGED TODAY</div><br>";
+        } else if (todayReward === "GIFT" || todayReward.includes("FREE")) {
+            todayHtml = "<div style='background: #25D366; color: #000; padding: 4px 10px; border-radius: 8px; display: inline-block; font-size: 13px; font-weight: 900; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);'>🎁 CLAIM TODAY'S GIFT</div><br>";
+        } else {
+            // YE RAHI TUMHARI TODAY WALI FIX (A, B)
+            todayHtml = "<div style='background: #25D366; color: #000; padding: 4px 10px; border-radius: 8px; display: inline-block; font-size: 13px; font-weight: 900; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);'>✅ TODAY: ₹" + todayReward + " OFF</div><br>";
+        }
+        
+        let nextHtml = "";
+        if (sCount >= 5) {
+            nextHtml = "<div style='font-size: 13px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.9); margin-top: 5px;'>CYCLE COMPLETED 🎉</div>";
+        } else if (nextReward === "GIFT" || nextReward.includes("FREE")) {
+            nextHtml = "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.9); margin-bottom: 4px;'>YOUR NEXT-BUY COUPON</div><span style='font-size: 22px; font-weight: 900;'>🎁 SURPRISE GIFT</span>";
+        } else {
+            // YE RAHI NEXT-BUY COUPON KI FIX (A, B)
+            nextHtml = "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.9); margin-bottom: 2px;'>YOUR NEXT-BUY COUPON</div><span style='font-size: 16px; opacity: 0.8;'>₹</span> <span style='font-size: 28px; font-weight: 900;'>" + nextReward + "</span> <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
+        }
+        
+        document.getElementById("revVoucher").innerHTML = todayHtml + nextHtml;
+        
     } else {
         document.getElementById("dynamicVoucherTitle").innerHTML = "YOUR NEXT-BUY COUPON";
+        
+        if (nextReward === "N/A" || nextReward === "") {
+            document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px;'>Visit Logged! Earn rewards next time.</span>";
+        } else if (nextReward === "GIFT" || nextReward.includes("FREE")) {
+            document.getElementById("revVoucher").innerHTML = "<span style='font-size: 22px; font-weight: 900;'>🎁 Surprise Gift!</span>";
+        } else {
+            document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px; opacity: 0.8;'>₹</span> <span style='font-size: 28px; font-weight: 900;'>" + nextReward + "</span> <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
+        }
     }
     
-    let subTitle = isConfirmed ? "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; color: rgba(255,255,255,0.9);'>YOUR NEXT-BUY COUPON</div>" : "";
-
-    if(vText === "N/A" || vText === "") {
-        document.getElementById("revVoucher").innerHTML = 
-            subTitle + 
-            "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + nextReward + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br>" +
-            "<span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
-    } else if (vText === "GIFT") {
-        document.getElementById("revVoucher").innerHTML = subTitle.replace("NEXT-BUY COUPON", "REWARD") + "<span style='font-size: 22px;'>🎁 Gift Earned!</span>";
-    } else if(vText === "TRY AGAIN" || vText === "JACKPOT" || vText.includes("FREE")) {
-        document.getElementById("revVoucher").innerHTML = subTitle.replace("NEXT-BUY COUPON", "REWARD") + vText;
-    } else {
-        document.getElementById("revVoucher").innerHTML = 
-            subTitle + 
-            "<span style='font-size: 16px; opacity: 0.8;'>₹</span> " + vText + " <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br>" +
-            "<span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
-    }
+    // --- SMART LOGIC ENDS ---
 
     document.getElementById("stampCountText").innerText = sCount;
     
@@ -350,7 +363,7 @@
       document.getElementById("voucher-box").classList.add("anti-fraud-pulse");
       document.getElementById("live-time").style.display = "block";
     } else if (data.status === "PENDING") {
-      document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting for Approval...</span>"; 
+      document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting 4 Approval</span>"; 
       document.getElementById("visitStatus").className = "status-badge bg-warning";
       nBtn.disabled = true; nBtn.innerHTML = "⏳ WAITING..."; waitForCashier(savedMobile);
     } else {
