@@ -226,7 +226,7 @@
       }
       if (data.status === "SUCCESS" || data.status === "ALREADY_PENDING") {
         btn.innerHTML = "⏳ WAITING...";
-        document.getElementById("visitStatus").innerText = "⏳ Waiting for cashier..."; 
+        document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting 4 Approval</span>"; 
         document.getElementById("visitStatus").className = "status-badge bg-warning";
         waitForCashier(savedMobile);
       } else { fetch(REVIZO_API + "?action=checkWallet&shopId=" + SHOP_ID + "&mobile=" + savedMobile).then(r => r.json()).then(showRewards); }
@@ -271,7 +271,6 @@
         document.getElementById("reviewBox").style.display = "block";
     }
 
-    // YAHAN EXCHANGE AUR NO REFUND POLICY DONO LINES ADD KI GAYI HAIN
     let exDays = data.exchangeDays || "7"
     document.getElementById("exchangeText").innerHTML = "* EXCHANGES VALID FOR " + exDays + " DAYS<br><span style='display:inline-block; margin-top:4px;'>* NO REFUND POLICY</span>";
 
@@ -351,7 +350,7 @@
       document.getElementById("voucher-box").classList.add("anti-fraud-pulse");
       document.getElementById("live-time").style.display = "block";
     } else if (data.status === "PENDING") {
-      document.getElementById("visitStatus").innerText = "⏳ Waiting for cashier..."; 
+      document.getElementById("visitStatus").innerHTML = "<span style='font-size: 20px; font-weight: 900;'>⏳ Waiting 4 Approval</span>"; 
       document.getElementById("visitStatus").className = "status-badge bg-warning";
       nBtn.disabled = true; nBtn.innerHTML = "⏳ WAITING..."; waitForCashier(savedMobile);
     } else {
