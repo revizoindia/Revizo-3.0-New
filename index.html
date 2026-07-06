@@ -126,14 +126,12 @@
   
   <div class="submit-container">
     <button class="futuristic-btn" id="btn-submit" onclick="submitForm()">CUSTOMER 🎁</button>
-    
     <button type="button" class="futuristic-btn btn-visitor" onclick="joinVisitor('default')">VISITOR 🎁</button>
   </div>
   <div class="footer-links">Privacy Policy & Data Protection</div>
 </div>
 
 <script>
-  // INJECTED FEATURE: PWA Registration (Triggers Install Bar in Browsers)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -183,7 +181,7 @@
         if(meta.logoUrl) {
             let logoImg = document.getElementById('shopLogo');
             logoImg.src = meta.logoUrl;
-            logoImg.style.display = "inline-block"; // Shows only after Excel image is ready
+            logoImg.style.display = "inline-block"; 
         }
       });
 
@@ -206,6 +204,8 @@
 
   window.addEventListener('offline', () => toggleOffline(true));
   window.addEventListener('online', () => { toggleOffline(false); syncOfflineData(); });
+  
+  // Warning block for accidental refresh (unless auto-redirecting)
   window.addEventListener('beforeunload', (e) => { if(isFormDirty) { e.preventDefault(); e.returnValue = ''; } });
 
   function toggleOffline(isOff) { const b = document.getElementById('network-badge'); if(isOff) b.classList.add('badge-offline'); else b.classList.remove('badge-offline'); }
@@ -220,7 +220,7 @@
 
   document.getElementById('input-name').addEventListener('blur', function() { let val = this.value.trim().replace(/[<>]/g, ""); this.value = val.toLowerCase().replace(/\b\w/g, s => s.toUpperCase()); const err = document.getElementById('name-error'); if(/\d/.test(this.value)) { this.classList.add('error-border'); err.style.display = 'block'; } else { this.classList.remove('error-border'); err.style.display = 'none'; } });
   
-  // FIX 2: SMART AUTO-LOGIN WHEN 10 DIGITS TYPED
+  // FIX: SMART AUTO-LOGIN WITHOUT "LEAVE SITE" WARNING
   document.getElementById('input-phone').addEventListener('input', function() { 
       this.value = this.value.replace(/\D/g, ''); 
       if (this.value.length === 10) {
@@ -233,6 +233,10 @@
               if(data.status !== "NOT_FOUND") {
                   localStorage.setItem("revizo_mobile", this.value);
                   localStorage.setItem("revizo_category", data.category || "default");
+                  
+                  // Disable the "Leave Site?" warning popup before redirecting
+                  isFormDirty = false; 
+                  
                   window.location.replace("rewards.html" + window.location.search);
               } else {
                   btn.innerText = originalText;
@@ -274,7 +278,7 @@
           if(!dob) { document.getElementById('input-dob').classList.add('error-border'); profileErr = true; }
           if(profileErr) { alert("NEW VIP: Please fill Name and Birthday to create wallet!"); btn.disabled = false; btn.innerText = "CUSTOMER 🎁"; return; }
           
-          let cat = "Other"; // Age is removed, sending default category
+          let cat = "Other"; 
           
           localStorage.setItem("revizo_mobile", phone); 
           let ann = formatSmartDate(document.getElementById('input-anni').value);
