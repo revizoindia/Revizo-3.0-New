@@ -222,6 +222,9 @@
   }
 
   function triggerJoinAction() {
+      // YAHAN PAR FIX HAI: Mark as joined instantly!
+      localStorage.setItem("wa_joined_gate", "true");
+      
       if (deferredPrompt) {
           // ANDROID: Trigger Install pop-up
           deferredPrompt.prompt();
@@ -269,6 +272,7 @@
               if(data.status === "APPROVED" || data.status === "PENDING" || data.status === "SUCCESS" || data.status === "CLAIMED") {
                   localStorage.setItem("revizo_mobile", this.value);
                   localStorage.setItem("revizo_category", data.category || "default");
+                  localStorage.setItem("wa_joined_gate", "true"); // YAHAN PAR BHI FIX HAI
                   isFormDirty = false; 
                   window.location.replace("rewards.html");
               } else { btn.innerText = originalText; }
@@ -292,6 +296,7 @@
       .then(res => res.json()).then(data => {
         if(data.status === "APPROVED" || data.status === "PENDING" || data.status === "SUCCESS" || data.status === "CLAIMED") {
           localStorage.setItem("revizo_mobile", phone); 
+          localStorage.setItem("wa_joined_gate", "true"); // YAHAN PAR BHI FIX HAI
           isFormDirty = false; window.location.replace("rewards.html");
         } else {
           let name = nameInput.value.trim().replace(/[<>]/g, ""); 
@@ -302,6 +307,7 @@
           fetch(REVIZO_API + "?action=submitFullProfile&shopId=" + SHOP_ID + "&mobile=" + phone + "&name=" + encodeURIComponent(name) + "&category=Other&dob=" + dob + "&anniversary=" + ann)
             .then(() => {
               localStorage.setItem("revizo_mobile", phone); 
+              localStorage.setItem("wa_joined_gate", "true"); // YAHAN PAR BHI FIX HAI
               isFormDirty = false; document.querySelectorAll('.save-draft').forEach(i => localStorage.removeItem('draft_' + i.id));
               window.location.replace("rewards.html");
             });
