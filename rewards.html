@@ -51,7 +51,6 @@
   .stars span:active { transform: scale(1.3); }
 
   @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
   @keyframes pulseFraud { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
   .anti-fraud-pulse { animation: pulseFraud 1.5s infinite; border: 2px dashed #25D366 !important; }
   .live-clock { font-family: monospace; font-size: 14px; color: #fff; font-weight: bold; margin-top: 10px; text-align: center; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 8px; display: none; }
@@ -136,14 +135,21 @@
 
 <script>
   const REVIZO_API = "https://script.google.com/macros/s/AKfycbzzzP7KIUr1GkW5et05N3qmxkQyfV_JDA5d1rkpNEnJLB9EQUHlRBTnERL4ojUZVdl5/exec"; 
+  
+  // DYNAMIC SHOP ID FOR MULTI-SHOP UNIVERSAL APP
   const urlParams = new URLSearchParams(window.location.search);
-  const SHOP_ID = urlParams.get('shop') || 'RAJAGARMENTS'; 
+  let SHOP_ID = urlParams.get('shop');
+  if (SHOP_ID) {
+      localStorage.setItem('current_shop_id', SHOP_ID);
+  } else {
+      SHOP_ID = localStorage.getItem('current_shop_id') || 'RAJAGARMENTS'; 
+  }
+  
   const savedMobile = localStorage.getItem("revizo_mobile");
-
   let systemData = {};
 
   if (!savedMobile) {
-      window.location.replace("index.html" + window.location.search);
+      window.location.replace("index.html");
   } else {
       document.body.style.display = "flex"; 
   }
@@ -161,9 +167,7 @@
       setTimeout(() => {
           localStorage.removeItem("revizo_mobile"); localStorage.removeItem("revizo_category"); localStorage.removeItem("wa_joined_gate"); 
           localStorage.clear(); sessionStorage.clear();
-          
-          let searchParams = window.location.search; let separator = searchParams ? "&" : "?";
-          const freshUrl = "index.html" + searchParams + separator + "nocache=" + Date.now();
+          const freshUrl = "index.html?nocache=" + Date.now();
           window.history.replaceState(null, null, freshUrl); window.location.replace(freshUrl);
       }, 50);
   }
@@ -273,7 +277,6 @@
     let exDays = data.exchangeDays || "7"
     document.getElementById("exchangeText").innerHTML = "* EXCHANGES VALID FOR " + exDays + " DAYS<br><span style='display:inline-block; margin-top:4px;'>* NO REFUND POLICY</span>";
 
-    let cat = localStorage.getItem("revizo_category") || data.category || "default";
     let waLink = data.dynamicWaLink; 
     
     if(waLink && !waLink.includes("PASTE_LINK")) {
@@ -281,13 +284,10 @@
         if(!localStorage.getItem("wa_joined_gate")) { document.getElementById("waGateOverlay").style.display = "flex"; }
     }
     
-    // --- YAHAN SE TUMHARI NAYI SMART COUPON LOGIC START HOTI HAI ---
-    
     let sCount = data.stamps || 0; 
     let minPur = data.minPurchase ? data.minPurchase : "499";
     let rewardsArr = data.milestoneRewards ? data.milestoneRewards.split(',') : ["N/A", "50", "75", "100", "GIFT"];
     
-    // Auto-calculate "Today's Reward" and "Next Reward" directly from Visit Count
     let todayReward = (sCount > 0 && rewardsArr[sCount - 1]) ? rewardsArr[sCount - 1].trim() : "N/A";
     let nextReward = (sCount < 5 && rewardsArr[sCount]) ? rewardsArr[sCount].trim() : "GIFT";
     
@@ -302,7 +302,6 @@
         } else if (todayReward === "GIFT" || todayReward.includes("FREE")) {
             todayHtml = "<div style='background: #25D366; color: #000; padding: 4px 10px; border-radius: 8px; display: inline-block; font-size: 13px; font-weight: 900; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);'>🎁 CLAIM TODAY'S GIFT</div><br>";
         } else {
-            // YE RAHI TUMHARI TODAY WALI FIX (A, B)
             todayHtml = "<div style='background: #25D366; color: #000; padding: 4px 10px; border-radius: 8px; display: inline-block; font-size: 13px; font-weight: 900; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);'>✅ TODAY: ₹" + todayReward + " OFF</div><br>";
         }
         
@@ -312,7 +311,6 @@
         } else if (nextReward === "GIFT" || nextReward.includes("FREE")) {
             nextHtml = "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.9); margin-bottom: 4px;'>YOUR NEXT-BUY COUPON</div><span style='font-size: 22px; font-weight: 900;'>🎁 SURPRISE GIFT</span>";
         } else {
-            // YE RAHI NEXT-BUY COUPON KI FIX (A, B)
             nextHtml = "<div style='font-size: 12px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.9); margin-bottom: 2px;'>YOUR NEXT-BUY COUPON</div><span style='font-size: 16px; opacity: 0.8;'>₹</span> <span style='font-size: 28px; font-weight: 900;'>" + nextReward + "</span> <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
         }
         
@@ -329,8 +327,6 @@
             document.getElementById("revVoucher").innerHTML = "<span style='font-size: 16px; opacity: 0.8;'>₹</span> <span style='font-size: 28px; font-weight: 900;'>" + nextReward + "</span> <span style='font-size: 14px; opacity: 0.8;'>OFF</span><br><span style='font-size: 12px; font-weight: 800; color: #e0f7fa; margin-top: 4px; display: inline-block; letter-spacing: 0.5px;'>*Min. purchase ₹" + minPur + "</span>";
         }
     }
-    
-    // --- SMART LOGIC ENDS ---
 
     document.getElementById("stampCountText").innerText = sCount;
     
